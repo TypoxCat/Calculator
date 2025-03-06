@@ -1,67 +1,91 @@
-const number = [4,2];
-let number1 = 0;
+let number1 = '';
 let operation = "";
-let number2 = 0;
+let number2 = '';
 let inputNumber;
 let step = 'a';
+let error = 0;
 const screen = document.querySelector(".display");
-// step a -> blm set num1 blm klik op
-//step b -> udh klik op, balik dr 2 ke 1 klo udh klik angka 2 trus klik op lg
-//step c -> udh klik num ke 2
+// Query buttons
 const btn = document.querySelectorAll("button");
+
+// Handle button clicks
 btn.forEach((btn) => btn.addEventListener("click", () => {
-    if (step == 'a'){
-        // alert("number");
-        switch(btn.classList.toString()) {
+    if (btn.classList.contains("clear")) {
+        reset();
+    }
+    if (btn.classList.contains("delete")) {
+        del();
+    }
+
+    if (error == 1){
+        reset();
+    }
+    // Handle step a
+    if (step == 'a') {
+        switch (btn.classList.toString()) {
             case "num":
-                displayNum(btn.textContent);
-                inputNumber = screen.textContent;
-                number1 = inputNumber;
+                number1 = updateNumber(btn.textContent, operation);
+                console.log(number1);
+                display(number1, operation, number2);
                 break;
             case "operator":
-                displayNum(btn.textContent);
-                operation = btn.id;
-                step = 'b';
-        }
-    } else if (step == 'b'){
-        switch(btn.classList.toString()) {
-            case "operator":
-                operation = btn.id;
-                displayOpt(operation);
-                break;
-            case "num":
-                if (operation != ""){
-                    const indexOpt = screen.textContent.indexOf(operation);
-                    displayNum(btn.textContent);
-                    inputNumber = screen.textContent.slice(indexOpt + 1);
-                    console.log("num2:" + inputNumber);
-                    number2 = inputNumber;
-                    break;
+                if (number1 != '') {
+                    operation = btn.id;
+                    display(number1, operation, number2);
+                    step = 'b'; // Move to step b
                 }
+                break;
+        }
+    } 
+    // Handle step b
+    else if (step == 'b') {
+        switch (btn.classList.toString()) {
+            case "operator":
+                if (operation !== btn.id && operation != '') { // Update the operation only if it's different
+                    display(number1, btn.textContent, number2); // Display new operator on the screen
+                }
+                operation = btn.id;
+                break;
+            case "num":
+                if (operation != "" ) {
+                    number2 = updateNumber(btn.textContent, operation);
+                } 
+                // else {
+                //     number1 = updateNumber(btn.textContent, operation);
+                //     step = 'a';
+                // }
+                break;
             case "equal":
                 let result = operate(Number(number1), operation, Number(number2));
                 displayResult(result);
                 number1 = result;
-                step = 'c';
+                step = 'c'; // Move to step c
                 break;
         }
-    } else if (step == 'c'){
-        switch(btn.classList.toString()) {
+    } 
+    // Handle step c
+    else if (step == 'c') {
+        switch (btn.classList.toString()) {
             case "operator":
-                operate(number1, operation, number2);
-                step = 'b';
+                operation = btn.id;
+                number2 = ''
+                display(number1, operation, number2);
+                step = 'b'; // Move back to step b
                 break;
             case "num":
                 inputNumber = btn.textContent;
                 number2 = inputNumber;
-                displayNum(inputNumber);
+                display(number1, operation, number2);
+                step = 'b';
         }
     }
     console.log(`${number1} ${number2} ${operation} ${step}`);
 }));
+
+// Operate function to calculate the result
 function operate(num1, opr, num2) {
     let result;
-    switch(opr.toString()) {
+    switch (opr) {
         case "+":
             result = addition(num1, num2);
             break;
@@ -73,66 +97,87 @@ function operate(num1, opr, num2) {
             break;
         case "/":
             result = division(num1, num2);
+            break;
     }
     return result;
 }
 
-function addition(a,b){
-    return a+b;
+function addition(a, b) {
+    return a + b;
 }
 
-function substraction(a,b){
-    return a-b;
+function substraction(a, b) {
+    return a - b;
 }
 
-function multiplication(a,b){
-    return a*b;
+function multiplication(a, b) {
+    return a * b;
 }
 
-function division(a,b){
-    return a/b;
+function division(a, b) {
+    if (b == 0){
+        error = 1;
+        return "Nu uh, error";
+    }
+    return a / b;
 }
 
-function displayNum(val){
-    screen.textContent += val;
+// Function to update number (detects the operator)
+function updateNumber(input, opt) {
+    let indexOpt = 0;
+    if (opt != "") {
+        indexOpt = screen.textContent.indexOf(operation) + 1; // Adjust based on the current operation position
+    }
+    screen.textContent += input;
+    inputNumber = screen.textContent.slice(indexOpt); // Get the number from the screen
+    return inputNumber;
 }
 
-function displayOpt(opt){
-    screen.textContent = screen.textContent.slice(0, -1) + opt;
+// Display a number on the screen
+function display(num1, opt, num2){
+    screen.textContent = screen.textContent.replace(operation, opt);
+    screen.textContent = `${num1}${opt}${num2}`
 }
 
-function displayResult(val){
+// Display the result
+function displayResult(val) {
+
     screen.textContent = val;
 }
 
-// const add = document.querySelector("#add");
-// add.addEventListener("click", (a,b) => {
-//     a = number[0];
-//     b = number[1];
-//     console.log(a,b)
-//     console.log(a+b);
-// })
+// Reset the calculator
+function reset() {
+    screen.textContent = "";
+    step = 'a'; // Reset to step a
+    number1 = '';
+    number2 = '';
+    operation = "";
+}
 
-// const subst = document.querySelector("#substract");
-// subst.addEventListener("click", (a,b) => {
-//     a = number[0];
-//     b = number[1];
-//     console.log(a,b)
-//     console.log(a-b);
-// })
-
-// const multi = document.querySelector("#multiply");
-// multi.addEventListener("click", (a,b) => {
-//     a = number[0];
-//     b = number[1];
-//     console.log(a,b)
-//     console.log(a*b);
-// })
-
-// const divi = document.querySelector("#divide");
-// divi.addEventListener("click", (a,b) => {
-//     a = number[0];
-//     b = number[1];
-//     console.log(a,b)
-//     console.log(a/b);
-// })
+// Delete the last character
+function del(){
+    switch(step){
+        case 'a': 
+            number1 = number1.toString().slice(0, -1);
+            display(number1, operation, number2);
+            break;
+        case 'b':
+            if (number2 != ''){
+                number2 = number2.toString().slice(0, -1);
+            } else if (operation != ''){
+                operation = '';
+                step = 'a';
+            }
+            display(number1, operation, number2);
+            break;
+        case 'c':
+            number2 = '';
+            operation = '';
+            if (number1 != ''){
+                number1 = number1.toString().slice(0, -1);
+                step = 'a';
+            }
+            display(number1, operation, number2);
+            break;
+    }
+}
