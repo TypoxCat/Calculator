@@ -8,6 +8,7 @@ const screen = document.querySelector(".display");
 // Query buttons
 const btn = document.querySelectorAll("button");
 
+const dot = document.getElementById("dot");
 // Handle button clicks
 btn.forEach((btn) => btn.addEventListener("click", () => {
     if (btn.classList.contains("clear")) {
@@ -20,13 +21,21 @@ btn.forEach((btn) => btn.addEventListener("click", () => {
     if (error == 1){
         reset();
     }
+
     // Handle step a
     if (step == 'a') {
         switch (btn.classList.toString()) {
             case "num":
-                number1 = updateNumber(btn.textContent, operation);
+                const input = btn.textContent;
+                if (number1.includes(".")){
+                    if (btn.textContent == '.'){
+                        input = '';
+                    }
+                }
+                number1 = updateNumber(input, operation);
                 console.log(number1);
                 display(number1, operation, number2);
+    
                 break;
             case "operator":
                 if (number1 != '') {
@@ -41,25 +50,35 @@ btn.forEach((btn) => btn.addEventListener("click", () => {
     else if (step == 'b') {
         switch (btn.classList.toString()) {
             case "operator":
-                if (operation !== btn.id && operation != '') { // Update the operation only if it's different
+                if (number2 != '' && btn.textContent == '%'){
+                    screen.textContent = `${number1}${operation}${number2}%`
+
+                }else if (operation !== btn.id && operation != '') { // Update the operation only if it's different
                     display(number1, btn.textContent, number2); // Display new operator on the screen
+                    operation = btn.id;
                 }
-                operation = btn.id;
                 break;
             case "num":
-                if (operation != "" ) {
-                    number2 = updateNumber(btn.textContent, operation);
+                if (operation != '' ) {
+                    const input = btn.textContent;
+                    if (number2.includes(".")){
+                        if (btn.textContent == '.'){
+                            input = '';
+                    }
+                }
+                    number2 = updateNumber(input, operation);
                 } 
-                // else {
-                //     number1 = updateNumber(btn.textContent, operation);
-                //     step = 'a';
-                // }
                 break;
-            case "equal":
-                let result = operate(Number(number1), operation, Number(number2));
-                displayResult(result);
-                number1 = result;
-                step = 'c'; // Move to step c
+            case "equal": 
+                if (number1 != '' && number2 != '' && operation != ''){
+                    let result = operate(Number(number1), operation, Number(number2));
+                    result = Number(result.toFixed(3));
+                    displayResult(result);
+                    number1 = result.toString();
+                    step = 'a'; // Move to step c
+                }
+                operation = '';
+                number2 = '';
                 break;
         }
     } 
@@ -84,42 +103,20 @@ btn.forEach((btn) => btn.addEventListener("click", () => {
 
 // Operate function to calculate the result
 function operate(num1, opr, num2) {
-    let result;
     switch (opr) {
         case "+":
-            result = addition(num1, num2);
-            break;
+            return num1 + num2;
         case "-":
-            result = substraction(num1, num2);
-            break;
+            return num1 - num2;
         case "x":
-            result = multiplication(num1, num2);
-            break;
+            return num1 * num2;
         case "/":
-            result = division(num1, num2);
-            break;
-    }
-    return result;
-}
-
-function addition(a, b) {
-    return a + b;
-}
-
-function substraction(a, b) {
-    return a - b;
-}
-
-function multiplication(a, b) {
-    return a * b;
-}
-
-function division(a, b) {
-    if (b == 0){
-        error = 1;
-        return "Nu uh, error";
-    }
-    return a / b;
+            if (num2 == 0){
+                error = 1;
+                return "Nu uh, error";
+            }
+            return num1 / num2;
+        }
 }
 
 // Function to update number (detects the operator)
@@ -141,7 +138,6 @@ function display(num1, opt, num2){
 
 // Display the result
 function displayResult(val) {
-
     screen.textContent = val;
 }
 
@@ -152,6 +148,7 @@ function reset() {
     number1 = '';
     number2 = '';
     operation = "";
+    error = 0;
 }
 
 // Delete the last character

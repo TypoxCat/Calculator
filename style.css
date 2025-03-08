@@ -1,34 +1,72 @@
+html,
 body {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    margin: 0 0 0 0;
+    margin: 0;
+    height: 100%;
 }
 
 header,
 footer {
-    font-size: 30px;
     display: flex;
+    padding: 10px;
     justify-content: center;
-    background-color: bisque;
-}
-
-p {
-    font-size: small;
-}
-
-.calcu {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
     border: 2px solid black;
 }
 
-.display {
-    padding: 50px;
-    background-color: beige
+header {
+    font-size: xx-large;
+    padding: 18px;
+}
+
+body {
+    border: 2px solid black;
+    display: flex;
+    flex-direction: column;
+}
+
+.middle {
+    display: flex;
+    align-self: center;
+    height: 100%;
+    margin-top: 20px;
+}
+
+.display{
+    padding: 20px;
+    height: 40px;
+    width: 190px;
+    border: 2px solid black;
+    font-size: x-large;
+    display: flex;
+    justify-content: end;
 }
 
 .buttons {
-    padding: 10px;
+    margin: 0 0 0 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    height: 100%;
+    width: 100%;
+}
+
+button {
+    flex-grow: 1;
+    margin: 10px;
+    height: 100%;
+    align-content: center;
+}
+
+#btn {
+    display: flex;
+    align-items: center;
+}
+.calcu {
+    width: 220px;
+    height: 350px;
+    border: 10px solid black;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 10px;
 }
